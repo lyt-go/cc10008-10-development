@@ -67,12 +67,15 @@
       <span>共 {{ total }} 条特征工程记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <FeatureLabelWorkbench ref="workbench" surface="feature" />
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
+import FeatureLabelWorkbench from '@/components/FeatureLabelWorkbench.vue'
 import {
   downloadEntries,
   listEntries,
@@ -82,11 +85,12 @@ import {
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('feature')
-const columns = ["模板编号", "特征名称", "特征类型", "计算逻辑", "时间窗口天", "聚合函数", "输出字段名", "缺失值填充"]
+const columns = ["模板编号", "特征名称", "特征类型", "计算逻辑", "时间窗口天", "聚合函数", "输出字段名", "缺失值填充", "模板版本", "业务版本", "字段归属顺序"]
 const actions = ["提交模板评审", "发布模板", "废弃模板"]
 const statuses = ["草稿", "模板评审中", "已发布", "已废弃"]
 const stats = [{"label": "特征模板总数", "value": 0}, {"label": "已发布模板", "value": 0}, {"label": "评审中模板", "value": 0}]
 
+const workbench = ref<InstanceType<typeof FeatureLabelWorkbench> | null>(null)
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
@@ -120,6 +124,7 @@ function runAction(action: string, row: EntryRow) {
     return
   }
   reload()
+  workbench.value?.reload()
 }
 
 function reload() {

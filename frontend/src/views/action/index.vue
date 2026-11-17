@@ -67,12 +67,15 @@
       <span>共 {{ total }} 条行动标签记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <FeatureLabelWorkbench ref="workbench" surface="action" />
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
+import FeatureLabelWorkbench from '@/components/FeatureLabelWorkbench.vue'
 import {
   downloadEntries,
   listEntries,
@@ -82,11 +85,12 @@ import {
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('action')
-const columns = ["规则编号", "标签名称", "标签类别", "触发事件组", "频率条件", "统计周期", "标签等级", "生效业务线"]
+const columns = ["规则编号", "标签名称", "标签类别", "触发事件组", "频率条件", "统计周期", "标签等级", "生效业务线", "规则版本", "业务版本"]
 const actions = ["提交规则评审", "生效规则", "停用规则"]
 const statuses = ["草稿", "规则评审中", "已生效", "已停用"]
 const stats = [{"label": "标签规则总数", "value": 0}, {"label": "已生效规则", "value": 0}, {"label": "评审中规则", "value": 0}]
 
+const workbench = ref<InstanceType<typeof FeatureLabelWorkbench> | null>(null)
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
@@ -120,6 +124,7 @@ function runAction(action: string, row: EntryRow) {
     return
   }
   reload()
+  workbench.value?.reload()
 }
 
 function reload() {
